@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/theme-provider"
-import { Moon, Sun, SunIcon } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import {Link} from "react-router-dom"
 
 
