@@ -3,9 +3,13 @@ import { Button } from "@/components/ui/button";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { AlertTriangle, MapPin, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useForecastQuerry, useReverseGeocodeQuerry, useWeatherQuerry } from "@/hooks/use-weather";
+import {
+  useForecastQuerry,
+  useReverseGeocodeQuerry,
+  useWeatherQuerry,
+} from "@/hooks/use-weather";
 import CurrentWeather from "@/components/CurrentWeather";
-
+import HourlyTemperature from "@/components/HourlyTemperature";
 
 const WeatherDashboard = () => {
   const {
@@ -15,25 +19,24 @@ const WeatherDashboard = () => {
     isLoading: locationLoading,
   } = useGeolocation();
 
-  const locationQuerry = useReverseGeocodeQuerry(coordinates)
+  const locationQuerry = useReverseGeocodeQuerry(coordinates);
 
-  console.log(locationQuerry.data)
+  console.log(locationQuerry.data);
 
   const weatherQuery = useWeatherQuerry(coordinates);
 
-  console.log(weatherQuery.data)
+  console.log(weatherQuery.data);
 
   const forecastQuery = useForecastQuerry(coordinates);
 
-  console.log(forecastQuery.data)
-
+  console.log(forecastQuery.data);
 
   const handleRefresh = () => {
     getLocation();
     if (coordinates) {
-      weatherQuery.refetch()
-      forecastQuery.refetch()
-      locationQuerry.refetch()
+      weatherQuery.refetch();
+      forecastQuery.refetch();
+      locationQuerry.refetch();
     }
   };
 
@@ -62,7 +65,7 @@ const WeatherDashboard = () => {
       <Alert variant="destructive">
         <AlertTitle>Location Required</AlertTitle>
         <AlertDescription className="flex flex-col gap-4">
-          <p>Please enable location access to see your local  weather.</p>
+          <p>Please enable location access to see your local weather.</p>
           <Button onClick={getLocation} variant={"outline"} className="w-fit">
             <MapPin mr-2 h-4 w-4 />
             Enable Location
@@ -74,8 +77,9 @@ const WeatherDashboard = () => {
 
   const locationName = locationQuerry.data?.[0];
 
-  if(weatherQuery.error || forecastQuery.error){
-    return <Alert variant="destructive">
+  if (weatherQuery.error || forecastQuery.error) {
+    return (
+      <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription className="flex flex-col gap-4">
@@ -86,10 +90,11 @@ const WeatherDashboard = () => {
           </Button>
         </AlertDescription>
       </Alert>
+    );
   }
 
-  if(!weatherQuery.data || !forecastQuery.data){
-    return <WeatherSkeleton/>
+  if (!weatherQuery.data || !forecastQuery.data) {
+    return <WeatherSkeleton />;
   }
 
   return (
@@ -97,19 +102,28 @@ const WeatherDashboard = () => {
       {/* favorite cities */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold tracking-tight">My Location</h1>
-        <Button variant={"outline"} size={"icon"} onClick={handleRefresh}
-        disabled={weatherQuery.isFetching || forecastQuery.isFetching}
+        <Button
+          variant={"outline"}
+          size={"icon"}
+          onClick={handleRefresh}
+          disabled={weatherQuery.isFetching || forecastQuery.isFetching}
         >
-          <RefreshCw className={`h-4 w-4 ${weatherQuery.isFetching ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-4 w-4 ${
+              weatherQuery.isFetching ? "animate-spin" : ""
+            }`}
+          />
         </Button>
       </div>
 
       <div className="grid gap-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <CurrentWeather data={weatherQuery.data} location={locationName} />
 
-      </div>
-      <CurrentWeather data={weatherQuery.data} location={locationName}/>
-      <div>
-        {/* details and forccast */}
+          <HourlyTemperature data={forecastQuery.data} />
+        </div>
+
+        <div>{/* details and forccast */}</div>
       </div>
     </div>
   );
